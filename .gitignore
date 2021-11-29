@@ -1,4 +1,4 @@
-#Project exclude paths
+# Project exclude paths
 /.idea/
 /cmake-build-debug/
 /localtest/InnerData/
