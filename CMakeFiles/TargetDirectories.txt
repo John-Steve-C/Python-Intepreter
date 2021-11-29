@@ -1,0 +1,4 @@
+/mnt/d/Coding/ACM_Big_Homework/Second/Python-Assignment-2021-master/CMakeFiles/rebuild_cache.dir
+/mnt/d/Coding/ACM_Big_Homework/Second/Python-Assignment-2021-master/CMakeFiles/edit_cache.dir
+/mnt/d/Coding/ACM_Big_Homework/Second/Python-Assignment-2021-master/CMakeFiles/code.dir
+/mnt/d/Coding/ACM_Big_Homework/Second/Python-Assignment-2021-master/CMakeFiles/antlr4-cpp-runtime.dir
