@@ -59,6 +59,7 @@ public:
     New_Any operator* (const New_Any &x);
     New_Any operator/ (const New_Any &x);
     New_Any operator% (const New_Any &x);
+    New_Any operator- () const;
 
     New_Any operator+= (const New_Any &x);
     New_Any operator-= (const New_Any &x);

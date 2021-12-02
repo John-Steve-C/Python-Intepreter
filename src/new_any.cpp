@@ -3,6 +3,7 @@
 //
 #include "new_any.h"
 #include <sstream>
+#include <iomanip>
 
 int2048 double_to_int(const double &x){
     string temp = to_string(x);
@@ -57,8 +58,10 @@ New_Any::New_Any(const string &s) {
     }
     else {
         string temp = s;
+//        cout << s << '\n';
         str_data = Format_string(temp);
         type_id = 4;
+//        cout << str_data << "x\n";
     }
 }
 New_Any::New_Any(const New_Any &x) {
@@ -74,19 +77,21 @@ int2048 New_Any::to_int() const {
     if (type_id == 2) {return double_to_int(double_data);}
     if (type_id == 3) {return bool_data;}
     if (type_id == 4) {return str_data;}
+    return int2048(0);
 }
 double New_Any::to_double() const {
     if (type_id == 1) {return (double) int_data;}
     if (type_id == 2) {return double_data;}
-    if (type_id == 3) {return (double) bool_data;}
-    if (type_id == 4) {return stod(str_data);}
+    if (type_id == 3) {return bool_data;}
+    if (type_id == 4) {return std::stod(str_data);}
+    return 0;
 }
 bool New_Any::to_bool() const {
     if (type_id == 1) {return (bool) (int_data != (int2048) 0 );}
     else if (type_id == 2) {return (bool) double_data;}
     else if (type_id == 3) {return bool_data;}
     else if (type_id == 4) {return !str_data.empty();}
-
+    return false;
 }
 string New_Any::to_str() const {
     if (type_id == 4) {
@@ -96,7 +101,10 @@ string New_Any::to_str() const {
         stringstream s;
         if (type_id == 1) s << int_data;
         else if (type_id == 2) s << double_data;
-        else if (type_id == 3) s << bool_data;
+        else if (type_id == 3) {
+            if (bool_data == true) s << "True";
+            else s << "False";
+        }
         return s.str();
     }
 }
@@ -171,11 +179,19 @@ New_Any New_Any::Minus(const New_Any &x, const New_Any &y) {
 New_Any New_Any::Multiple(const New_Any &x, const New_Any &y) {
     New_Any tp(x),temp(y);
     //字符串，特殊处理
-    if (x.type_id == 4) {
-        for (int2048 i = 0;i <= temp.to_int();i += 1){
-            tp.str_data += x.str_data;
+    if (x.type_id == 4 || y.type_id == 4) {//两个都要判断
+        if (x.type_id == 4) {
+            for (int2048 i = 1;i < temp.to_int();i += 1){
+                tp.str_data += x.str_data;
+            }
+            return tp;
         }
-        return tp;
+        else {
+            for (int2048 i = 1;i < tp.to_int();i += 1){
+                temp.str_data += y.str_data;
+            }
+            return temp;
+        }
     }
     //double
     if (x.type_id == 2 || y.type_id == 2) {
@@ -219,6 +235,9 @@ New_Any New_Any::operator% (const New_Any &x) {
     New_Any a(*this),b(x);
     return a - ( a / b ) * b;
 }
+New_Any New_Any::operator-() const { //负号的重载
+    return New_Any(int2048(0)) - *this;
+}
 
 New_Any New_Any::operator+= (const New_Any &x){
     return *this = *this + x;
@@ -240,9 +259,10 @@ New_Any New_Any::operator%=(const New_Any &x) {
 std::ostream &operator<<(std::ostream &output,const New_Any &x){
     if (x.type_id == 0) output << "None";
     if (x.type_id == 1) output << (int2048) x.int_data;
-    if (x.type_id == 2) output << (double) x.double_data;
+    if (x.type_id == 2) output << std::fixed << std::setprecision(6) << x.double_data;
+    //设置默认输出6位小数
     if (x.type_id == 3) {
-        if (x.bool_data == true) output << "True";
+        if (x.bool_data) output << "True";
         else output << "False";
     }
     if (x.type_id == 4) {

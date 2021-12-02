@@ -118,7 +118,8 @@ antlrcpp::Any EvalVisitor::visitOr_test(Python3Parser::Or_testContext *ctx) {
     auto and_list = ctx->and_test();
     if (and_list.size() == 1) return visitAnd_test(and_list[0]); //递归遍历(dfs)
     for (auto i:and_list){
-        ans = ans || visitAnd_test(i).as<bool>(); // need to change！
+        New_Any temp = Query(visitAnd_test(i) );
+        ans = ans || temp.bool_data; // need to change！
         if (ans) return New_Any(true); //剪枝
     }
 
@@ -130,7 +131,8 @@ antlrcpp::Any EvalVisitor::visitAnd_test(Python3Parser::And_testContext *ctx) {
     auto not_list = ctx->not_test();
     if (not_list.size() == 1) return visitNot_test(not_list[0]);
     for (auto i:not_list){
-        ans = ans && visitNot_test(i).as<bool>();
+        New_Any temp = Query( visitNot_test(i) );
+        ans = ans && temp.bool_data;
         if (!ans) return New_Any(false);
     }
 
@@ -140,7 +142,9 @@ antlrcpp::Any EvalVisitor::visitAnd_test(Python3Parser::And_testContext *ctx) {
 antlrcpp::Any EvalVisitor::visitNot_test(Python3Parser::Not_testContext *ctx) {
     if (ctx->comparison()) return visitComparison(ctx->comparison());
 
-    return (New_Any) !visitNot_test(ctx->not_test()).as<bool>();
+    New_Any temp = Query(visitNot_test(ctx->not_test()) );
+    temp.bool_data = ! temp.bool_data;//取反
+    return temp;
 }
 
 //todo:比较大小,返回真假
@@ -180,7 +184,6 @@ antlrcpp::Any EvalVisitor::visitArith_expr(Python3Parser::Arith_exprContext *ctx
     New_Any ret = Query(visitTerm(termArray[0]) );
     for (int i = 1; i < termArray.size(); ++i) {
         std::string tmpOp = opArray[i - 1]->getText();
-
         New_Any temp = Query(visitTerm(termArray[i]) );
 
         if (tmpOp == "+") ret += temp;
@@ -195,15 +198,16 @@ antlrcpp::Any EvalVisitor::visitTerm(Python3Parser::TermContext *ctx) {
     auto factorArray = ctx->factor();
     if (factorArray.size() == 1) return visitFactor(factorArray[0]);
 
-    New_Any ans;
     auto opArray = ctx->muldivmod_op();
     New_Any ret = Query(visitFactor(factorArray[0]) );
     for (int i = 1; i < factorArray.size(); ++i) {
         std::string tmpOp = opArray[i - 1]->getText();
+//        auto op = opArray[i - 1];
 
         New_Any temp = Query(visitFactor(factorArray[i]) );
 
         if (tmpOp == "*") ret *= temp;
+        //应该区分！
         else if (tmpOp == "//" || tmpOp == "/") ret /= temp;
         else if (tmpOp == "%") ret %= temp;
 //            else throw Exception("", UNIMPLEMENTED);
@@ -212,8 +216,12 @@ antlrcpp::Any EvalVisitor::visitTerm(Python3Parser::TermContext *ctx) {
 }
 
 antlrcpp::Any EvalVisitor::visitFactor(Python3Parser::FactorContext *ctx) {
-//    if (ctx->atom_expr()) return visitAtom_expr(ctx->atom_expr());
-    return visitChildren(ctx);
+    if (ctx->atom_expr()) return visitAtom_expr(ctx->atom_expr());
+    if (ctx->ADD()) //判断数字前的符号
+        return Query(visitFactor(ctx->factor()));
+    else    //带负号
+        return -Query(visitFactor(ctx->factor()));
+//    return visitChildren(ctx);
 }
 
 //返回的是New_Any
@@ -226,15 +234,29 @@ antlrcpp::Any EvalVisitor::visitAtom_expr(Python3Parser::Atom_exprContext *ctx) 
 
     if (functionName == "print") {
         std::cout << argsArray[0];
-        for (int i = 1; i < argsArray.size(); ++i)
+        for (int i = 1; i < argsArray.size(); ++i){
+//            std::cout << argsArray[i].type_id << std::endl;
+            //为什么没输出呢?
             std::cout << " " << argsArray[i];
+        }
         std::cout << '\n';
         return New_Any();
     } else if (functionName == "int") {
-        return New_Any(argsArray[0]);
+        if (argsArray.empty() ) {
+            return New_Any(int2048(0) );
+        }
+        else return New_Any(argsArray[0].to_int() );
     } else if (functionName == "float") {
-
+        if (argsArray.empty() ) {
+            return New_Any(double(0) );
+        }
+        else return New_Any(argsArray[0].to_double() );
     } else if (functionName == "bool") {
+        if (argsArray.empty() ) {
+            return New_Any(false);
+        }
+        else return New_Any(argsArray[0].to_bool() );
+    } else if (functionName == "str") {
 
     }
     else {

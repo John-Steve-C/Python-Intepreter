@@ -14,9 +14,6 @@ class Scope {
 
 private:
     std::map<std::string, New_Any> varTable;
-    std::map<std::string, int> varTable_int;
-    std::map<std::string, std::string> varTable_string;
-    std::map<std::string, double> varTable_double;
 
 public:
     Scope();//

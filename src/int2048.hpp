@@ -501,10 +501,13 @@ namespace sjtu {
             if (a < b) return 0;
             else return 1;
         }
+
+        //重载int2048->double的类型转换,直接按位转换即可
         operator double() const {
             double ans = 0;
             for (int i = 0;i < len;++i){
-                ans = ans * 10 + num[i] - '0';
+                //num存的是压位后的数据！要乘base
+                ans = ans * base + num[i];
             }
             return ans;
         }

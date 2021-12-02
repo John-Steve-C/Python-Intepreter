@@ -1,8 +1,10 @@
-#String Operation Test
-Hello = "Hello, "
-World = "World!"
-print(Hello + World)
-Hello *= 3
-print(Hello)
-h = 0-5
-print(h)
+i = 12.0
+j = 4
+print(i)
+print(j)
+print(i+j)
+print(i-j)
+print(i*j)
+print(i/j)
+a = -5
+print(a)
