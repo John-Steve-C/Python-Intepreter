@@ -102,7 +102,7 @@ string New_Any::to_str() const {
         if (type_id == 1) s << int_data;
         else if (type_id == 2) s << double_data;
         else if (type_id == 3) {
-            if (bool_data == true) s << "True";
+            if (bool_data) s << "True";
             else s << "False";
         }
         return s.str();
@@ -206,17 +206,17 @@ New_Any New_Any::Multiple(const New_Any &x, const New_Any &y) {
         return tp;
     }
 //    if (x.type_id == 3) return x.bool_data && temp.to_bool();
-
 }
+
+//todo:浮点除
 New_Any New_Any::Div(const New_Any &x, const New_Any &y) {
     New_Any tp(x),temp(y);
-    if (x.type_id == 2 || y.type_id == 2) {//浮点除
-        New_Any t(x);
-        return t.to_double() * temp.to_double();
-    }
-    //剩下的都是整除
-    if (x.type_id == 1) return x.int_data / temp.to_int();
-//    if (x.type_id == 3) return x.bool_data / temp.to_bool();
+    return tp.to_double() / temp.to_double();
+}
+//todo:整除
+New_Any New_Any::IDiv(const New_Any &x, const New_Any &y) {
+    New_Any tp(x),temp(y);
+    return tp.to_int() / temp.to_int();
 }
 
 New_Any New_Any::operator+ (const New_Any &x){

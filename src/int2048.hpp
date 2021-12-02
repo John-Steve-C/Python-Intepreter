@@ -509,7 +509,10 @@ namespace sjtu {
                 //num存的是压位后的数据！要乘base
                 ans = ans * base + num[i];
             }
-            return ans;
+            if (flag == -1)
+                return -ans;
+            else
+                return ans;
         }
     };
 }

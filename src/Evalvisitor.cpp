@@ -62,8 +62,11 @@ antlrcpp::Any EvalVisitor::visitExpr_stmt(Python3Parser::Expr_stmtContext *ctx) 
             scope.varRegister(varName, scope.varQuery(varName).second - varData);
         } else if (op == "*=") {
             scope.varRegister(varName, varData * scope.varQuery(varName).second);
-        } else if (op == "//=" || op == "/=") {
+        } else if (op == "/=") {
             scope.varRegister(varName, scope.varQuery(varName).second / varData);
+        } else if (op == "//=") {
+            New_Any temp = scope.varQuery(varName).second;
+            scope.varRegister(varName, temp.IDiv(temp,varData));
         } else if (op == "%=") {
             scope.varRegister(varName, scope.varQuery(varName).second % varData);
         }
@@ -207,8 +210,8 @@ antlrcpp::Any EvalVisitor::visitTerm(Python3Parser::TermContext *ctx) {
         New_Any temp = Query(visitFactor(factorArray[i]) );
 
         if (tmpOp == "*") ret *= temp;
-        //应该区分！
-        else if (tmpOp == "//" || tmpOp == "/") ret /= temp;
+        else if (tmpOp == "//") ret = ret.IDiv(ret,temp);
+        else if (tmpOp == "/") ret /= temp;
         else if (tmpOp == "%") ret %= temp;
 //            else throw Exception("", UNIMPLEMENTED);
     }

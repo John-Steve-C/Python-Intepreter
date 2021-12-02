@@ -54,6 +54,7 @@ public:
     New_Any Minus(const New_Any &x,const New_Any &y);
     New_Any Multiple(const New_Any &x,const New_Any &y);
     New_Any Div(const New_Any &x,const New_Any &y);
+    New_Any IDiv(const New_Any &x,const New_Any &y);
     New_Any operator+ (const New_Any &x);
     New_Any operator- (const New_Any &x);
     New_Any operator* (const New_Any &x);
