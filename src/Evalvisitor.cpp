@@ -100,10 +100,30 @@ antlrcpp::Any EvalVisitor::visitCompound_stmt(Python3Parser::Compound_stmtContex
 
 //todo:if分支和 while循环
 antlrcpp::Any EvalVisitor::visitIf_stmt(Python3Parser::If_stmtContext *ctx) {
-    return visitChildren(ctx);
+    auto test_array = ctx->test();
+    auto suite_array = ctx->suite();
+    int i, elif_num = ctx->ELIF().size();
+    for (i = 0;i <= elif_num;++i){
+        //if 为真,按嵌套顺序访问
+        if ( Query(visitTest(test_array[i]) ).to_bool() )
+            return visitSuite(suite_array[i]);
+    }
+    if (ctx->ELSE()) return visitSuite(suite_array[i]);
+
+//    return visitChildren(ctx);
+    return New_Any();
 }
 
+//不能直接用string表示，要重新定义状态
 antlrcpp::Any EvalVisitor::visitWhile_stmt(Python3Parser::While_stmtContext *ctx) {
+    while ( Query( visitTest(ctx->test()) ).to_bool() ) {
+        auto res = visitSuite( ctx->suite() ).as<string>();
+        if ( res == "break")
+            break;
+        else if (res == "return")
+            return New_Any();
+    }
+
     return visitChildren(ctx);
 }
 

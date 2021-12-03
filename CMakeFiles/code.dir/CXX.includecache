@@ -30,26 +30,6 @@ vector
 complex
 -
 
-/mnt/d/Coding/ACM_Big_Homework/Second/Python-Assignment-2021-master/src/main.cpp
-iostream
--
-antlr4-runtime.h
-/mnt/d/Coding/ACM_Big_Homework/Second/Python-Assignment-2021-master/src/antlr4-runtime.h
-Python3Lexer.h
-/mnt/d/Coding/ACM_Big_Homework/Second/Python-Assignment-2021-master/src/Python3Lexer.h
-Python3Parser.h
-/mnt/d/Coding/ACM_Big_Homework/Second/Python-Assignment-2021-master/src/Python3Parser.h
-Evalvisitor.h
-/mnt/d/Coding/ACM_Big_Homework/Second/Python-Assignment-2021-master/src/Evalvisitor.h
-
-/mnt/d/Coding/ACM_Big_Homework/Second/Python-Assignment-2021-master/src/new_any.cpp
-new_any.h
-/mnt/d/Coding/ACM_Big_Homework/Second/Python-Assignment-2021-master/src/new_any.h
-sstream
--
-iomanip
--
-
 /mnt/d/Coding/ACM_Big_Homework/Second/Python-Assignment-2021-master/src/new_any.h
 string
 -
@@ -57,10 +37,6 @@ int2048.hpp
 /mnt/d/Coding/ACM_Big_Homework/Second/Python-Assignment-2021-master/src/int2048.hpp
 map
 -
-
-/mnt/d/Coding/ACM_Big_Homework/Second/Python-Assignment-2021-master/src/scope.cpp
-scope.h
-/mnt/d/Coding/ACM_Big_Homework/Second/Python-Assignment-2021-master/src/scope.h
 
 /mnt/d/Coding/ACM_Big_Homework/Second/Python-Assignment-2021-master/src/scope.h
 map
@@ -75,14 +51,6 @@ antlr4-runtime.h
 generated/antlr4-runtime.h
 Python3Visitor.h
 generated/Python3Visitor.h
-
-generated/Python3Lexer.h
-antlr4-runtime.h
-generated/antlr4-runtime.h
-Python3Parser.h
-generated/Python3Parser.h
-regex
--
 
 generated/Python3Parser.h
 antlr4-runtime.h

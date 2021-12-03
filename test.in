@@ -1,5 +1,5 @@
-i = 12.0
-j = -5
+i = 12.5
+j = -5.5
 print(i)
 print(j)
 print(i+j)
@@ -9,3 +9,13 @@ print(i//j)
 print(i/j)
 i //= j
 print(i)
+#If Statement
+a = 10
+b = 10
+if a < b:
+    print(b)
+elif a > b:
+     print(a)
+else:
+     print("equal")
+
