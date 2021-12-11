@@ -290,7 +290,6 @@ namespace sjtu {
         //高精度乘法
         int2048 &operator*=(const int2048 &b) {//20*15不对
             int i, j;
-            long long x, temp;
             int2048 ans(0);//必须新开一个ans来临时存储乘积,否则会把原本的a覆盖
 
             if (*this == int2048(0) || b == int2048(0)) {
@@ -301,23 +300,20 @@ namespace sjtu {
             if (flag * b.flag > 0) ans.flag = 1;//符号判断
             else ans.flag = -1;
 
-            ans.num.resize(len + b.len,0);//重设容器的大小
+            ans.num.resize(len + b.len, 0);//重设容器的大小
             for (i = 0; i < len; ++i) {//列竖式时b在上,a在下
-                x = 0;
                 for (j = 0; j < b.len; ++j) {
-                    temp = num[i] * b.num[j] + x + ans.num[i + j];//注意下标
-                    x = temp / base;//进位x
-                    temp %= base;
-                    ans.num[i + j] = temp;
+                    ans.num[i + j] += num[i] * b.num[j];//注意下标
+                    ans.num[i + j + 1] += ans.num[i + j] / base;//进位x
+                    ans.num[i + j] %= base;
                 }
-                if (x != 0) ans.num[i + j] += x;//最高位
             }
 
-            ans.len = i + j;
-            while (ans.num[ans.len - 1] == 0 && ans.len > 1){//前导0
-                ans.len--;
+            while (!ans.num.back() && ans.num.size() > 1) {//前导0
                 ans.num.pop_back();
             }
+            ans.len = ans.num.size();
+
             return *this = ans;//赋值
         }
 
@@ -327,76 +323,55 @@ namespace sjtu {
             return c;
         }
 
-//获取pos位置上的数值，用于防止下标越界，简化输入处理
-        long long get(unsigned pos) const {
-            if (pos >= num.size())
-                return 0;
-            return num[pos];
-        }
-
-        //快速试商法
-        int2048 &sub_mul(const int2048 &b,long long mul,long long offset){
-            if (mul == 0) return *this;
-            int borrow = 0;
-
-            for (int i = 0;i < b.len;++i){
-                borrow += num[i + offset] - b.num[i] * mul - base + 1;
-                num[i + offset] = borrow % base + base - 1;
-                borrow /= base;
-            }
-
-            for (int i = b.len;borrow;++i){//把借位处理完
-                borrow += num[i + offset] - base + 1;
-                num[i + offset] = borrow % base + base - 1;
-                borrow /= base;
-            }
-            return *this;
-        }
-
         int2048 &operator/=(const int2048 &divisor) {
 //            if (b == 0) return error;
 
-            int2048 ans(0), a(*this), b(divisor);
+            int2048 ans(0), a(*this), b(divisor), product(0), multiple(0);
             int maxsize = a.len - b.len;
             b.flag = a.flag = 1;//无符号运算
 
-            if (a < b) return *this = int2048(0);
-
-            ans.num.clear();
-            ans.num.resize(maxsize + 1,0);
-            double t = (b.get(b.num.size() - 2) + b.get(b.num.size() - 3) + 1.0) / base;
-            double db = 1.0 / (b.num.back() + t / base);
-
-            for (int i = a.num.size() - 1,j = ans.num.size() - 1; j <= a.num.size(); ){
-                long long rm = a.get(i + 1) * base + a.get(i);
-                long long m = std::max( (long long)(db * rm) , a.get(i + 1) );
-                a.sub_mul(b , m , j);
-                ans.num[j] += m;
-                if (!a.get(i + 1) )
-                    --i,--j;
+            if (a < b) {
+                if (flag * divisor.flag > 0)
+                    return *this = int2048(0);
+                else
+                    return *this = int2048(-1);//注意取整问题
             }
 
-            while (a.num.back() == 0 && a.num.size() > 1){
-                a.num.pop_back();
-            }
+            while (a >= b) {
+                multiple.num.clear();
+                multiple.num.resize(maxsize + 1, 0);
+                multiple.num[maxsize] = 1;//multiple = 10^(maxsize-1)
+                multiple.flag = 1;
+                multiple.len = maxsize + 1;
 
-            long long carry = 0;
-            while (a >= b){
-                a.minus(b);
-                ++carry;
-            }
-            for (int i = 0;i < ans.num.size();++i){
-                carry += ans.num[i];
-                ans.num[i] = carry % base;
-                carry /= base;
-            }
+                product = b * multiple;//把b移动到当前位置
 
-            while (ans.num.back() == 0 && ans.num.size() > 1){
-                ans.num.pop_back();
+                /*while (a >= product) {
+                    a -= product;//用减法来模拟试商
+                    ans += multiple;//当前位数的统计
+                }*/
+
+                int l = 0, r = base - 1, mid;//用二分来试商
+                int2048 cur = 0, t;//试出来的商
+                while (l <= r) {
+                    mid = (l + r) >> 1;
+                    t = int2048(mid);
+                    if (t * product <= a) {
+                        cur = cur >= t ? cur : t;
+                        l = mid + 1;
+                    } else r = mid - 1;
+                }
+                a -= product * cur;//用二分来试商
+                ans += multiple * cur;//当前位数的统计
+
+                maxsize--;
             }
 
             if (flag * divisor.flag > 0) ans.flag = 1;//符号判断
-            else ans.flag = -1;
+            else {
+                ans.flag = -1;
+                if (ans * divisor != *this) ans -= 1;//手动下取整,负数需要特判
+            }
 
             return *this = ans;
         }
@@ -505,7 +480,7 @@ namespace sjtu {
         //重载int2048->double的类型转换,直接按位转换即可
         operator double() const {
             double ans = 0;
-            for (int i = 0;i < len;++i){
+            for (int i = 0; i < len; ++i) {
                 //num存的是压位后的数据！要乘base
                 ans = ans * base + num[i];
             }

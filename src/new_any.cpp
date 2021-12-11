@@ -233,7 +233,7 @@ New_Any New_Any::operator/ (const New_Any &x){
 }
 New_Any New_Any::operator% (const New_Any &x) {
     New_Any a(*this),b(x);
-    return a - ( a / b ) * b;
+    return a - a.IDiv(a,b) * b;
 }
 New_Any New_Any::operator-() const { //负号的重载
     return New_Any(int2048(0)) - *this;
