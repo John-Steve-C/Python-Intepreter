@@ -1,12 +1,16 @@
 # Project exclude paths
 /.idea/
 /cmake-build-debug/
+/CMakeFiles/
 /localtest/
+/Testing/
+
 
 code
 Makefile
 cmake_install.cmake
 CMakeCache.txt
+CMakeLists.txt
 libantlr4-cpp-runtime.a
 python_interpreter.cbp
 ans.txt
